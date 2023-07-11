@@ -35,7 +35,7 @@ services:
 {% if lighthouse_default_fee_recipient != ""  %}
       --suggested-fee-recipient={{ lighthouse_default_fee_recipient }}
 {% endif %}
-{% if lighthouse_disable_deposit_contract_sync|bool = True  %}
+{% if lighthouse_disable_deposit_contract_sync|bool == True  %}
       --disable-deposit-contract-sync
 {% endif %}
 {% if lighthouse_http_enabled|bool == True  %}
@@ -51,7 +51,7 @@ services:
 {% endif %}
       --debug-level={{ lighthouse_log_level }}
       --log-format=JSON
-      --log-file=/log/lighthouse-beacon.log
+      --logfile=/log/lighthouse-beacon.log
       --validator-monitor-auto
 
 {% if lighthouse_validator_enabled|bool == True  %}
@@ -89,6 +89,6 @@ services:
 {% endif %}
       --debug-level={{ lighthouse_log_level }}
       --log-format=JSON
-      --log-file=/log/lighthouse-validator.log
+      --logfile=/log/lighthouse-validator.log
 {% endif %}
 

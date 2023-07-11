@@ -9,5 +9,5 @@
   include_tasks: "network.yml"
   when: not lighthouse_host_ip
 
-- name: Install lodestar
+- name: Install lighthouse
   include_tasks: "install.yml"

@@ -37,8 +37,18 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_config_dir`          | /etc/lighthouse                    | Path for default configuration                                                                                      |
 | `lighthouse_data_dir`            | /opt/lighthouse/data               | Path for data directory                                                                                             |
 | `lighthouse_log_dir`             | /var/log/lighthouse                | Path for logs directory                                                                                             |
+| `lighthouse_log_level`           | "info"                             | Log level                                                                                                           |
 | `lighthouse_network`             | mainnet                            | Predefined network configuration                                                                                    |
-| `lighthouse_host_ip`             | ""                                 |                                                                                                                     |
+| `lighthouse_jwt_auth_file`       | "/etc/jwt-secret.hex"              | Path of the JWT file                                                                                                |
+| `lighthouse_enable_doppelganger_protection` | True                    | Doppleganger protection enabled by default                                                                          |
+| `lighthouse_validator_enabled`              | "False"                 | Whether to run in validator mode - please note that the secrets and keys need to be copied by you                   |
+| `lighthouse_execution_urls`                 | "http://127.0.0.1:8551" | The elc execution url                                                                                               |
+| `lighthouse_validator_beaconnodes`          | "http://lighthouse-beacon:9596" | The beacon endpoint for the validator to use                                                                |
+| `lighthouse_checkpoint_sync_url`            | "https://beaconstate-{{lighthouse_network}}.chainsafe.io" | Checkpoint sync to speed things up                                                |
+| `lighthouse_default_fee_recipient`          | ""                     | The default fee recepient address                                                                                    |
+| `lighthouse_disable_deposit_contract_sync`  | True                   |  The deposit_contract_sync for validators                                                                            |
+| `lighthouse_keystores_dir`  | "/config/keys"                         |  The keys directory for validators                                                                                   |
+| `lighthouse_secrets_dir`    | "/config/secrets"                      |  The secrets directory for validators                                                                                |
 
 ### Keys/Secrets
 Please note that you must put your own secrets and keys in the config directory that you are using ie `lighthouse_config_dir`
