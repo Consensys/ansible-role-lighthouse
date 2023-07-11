@@ -4,6 +4,7 @@ services:
   lighthouse-beacon:
     container_name: lighthouse-beacon
     image: "{{ lighthouse_image }}:{{ lighthouse_version }}"
+    restart: always
     user: "{{ lighthouse_user_details.uid}}:{{ lighthouse_group_details.gid }}"
     ports:
       - {{ lighthouse_p2p_port }}:{{ lighthouse_p2p_port }}/tcp 
@@ -58,6 +59,7 @@ services:
   lighthouse-validator:
     container_name: lighthouse-validator
     image: "{{ lighthouse_image }}:{{ lighthouse_version }}"
+    restart: always
     user: "{{ lighthouse_user_details.uid}}:{{ lighthouse_group_details.gid }}"
     depends_on:
       - lighthouse-beacon
