@@ -1,0 +1,94 @@
+version: '3.6'
+
+services:
+  lighthouse-beacon:
+    container_name: lighthouse-beacon
+    image: "{{ lighthouse_image }}:{{ lighthouse_version }}"
+    user: "{{ lighthouse_user_details.uid}}:{{ lighthouse_group_details.gid }}"
+    ports:
+      - {{ lighthouse_p2p_port }}:{{ lighthouse_p2p_port }}/tcp 
+      - {{ lighthouse_p2p_port }}:{{ lighthouse_p2p_port }}/udp
+{% if lighthouse_metrics_enabled|bool == True  %}
+      - 127.0.0.1:{{lighthouse_metrics_port}}:{{lighthouse_metrics_port}}
+{% endif %}
+{% if lighthouse_http_enabled|bool == True  %}
+      - 127.0.0.1:{{lighthouse_http_port}}:{{lighthouse_http_port}}
+{% endif %}
+{% if lighthouse_validator_enabled|bool == True  %}
+      - 127.0.0.1:9596:9596
+{% endif %}      
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - {{ lighthouse_data_dir }}:/data
+      - {{ lighthouse_config_dir }}:/config
+      - {{ lighthouse_jwt_auth_file}}:/jwt/jwt-secret.hex:ro
+      - {{ lighthouse_log_dir }}:/log
+    command: >-
+      lighthouse
+      bn
+      --datadir=/data
+      --network={{ lighthouse_network }}
+      --execution-jwt=/jwt/jwt-secret.hex
+      --port={{ lighthouse_p2p_port }}
+      --execution-endpoint={{ lighthouse_execution_urls }}
+      --checkpoint-sync-url={{ lighthouse_checkpoint_sync_url }}
+{% if lighthouse_default_fee_recipient != ""  %}
+      --suggested-fee-recipient={{ lighthouse_default_fee_recipient }}
+{% endif %}
+{% if lighthouse_disable_deposit_contract_sync|bool = True  %}
+      --disable-deposit-contract-sync
+{% endif %}
+{% if lighthouse_http_enabled|bool == True  %}
+      --http
+      --http-address="{{ lighthouse_http_interface }}"
+      --http-port={{ lighthouse_http_port }}
+      --http-allow-origin="{{ lighthouse_http_cors }}"
+{% endif %}
+{% if lighthouse_metrics_enabled|bool == True  %}
+      --metrics
+      --metrics-address="{{ lighthouse_metrics_interface }}"
+      --metrics-port={{ lighthouse_metrics_port }}
+{% endif %}
+      --debug-level={{ lighthouse_log_level }}
+      --log-format=JSON
+      --log-file=/log/lighthouse-beacon.log
+      --validator-monitor-auto
+
+{% if lighthouse_validator_enabled|bool == True  %}
+  lighthouse-validator:
+    container_name: lighthouse-validator
+    image: "{{ lighthouse_image }}:{{ lighthouse_version }}"
+    user: "{{ lighthouse_user_details.uid}}:{{ lighthouse_group_details.gid }}"
+    depends_on:
+      - lighthouse-beacon
+    volumes:
+      - {{ lighthouse_data_dir }}:/data
+      - {{ lighthouse_config_dir }}:/config
+      - {{ lighthouse_jwt_auth_file}}:/jwt/jwt-secret.hex:ro
+      - {{ lighthouse_log_dir }}:/log
+    command: >-
+      lighthouse
+      vc
+      --datadir=/data
+      --network={{ lighthouse_network }}
+      --execution-jwt=/jwt/jwt-secret.hex
+      --beacon-nodes="{{ lighthouse_validator_beaconnodes }}"
+      --validators-dir="{{ lighthouse_keystores_dir }}"
+      --secrets-dir="{{ lighthouse_secrets_dir }}"
+      --init-slashing-protection
+{% if lighthouse_default_fee_recipient != ""  %}
+      --suggested-fee-recipient={{ lighthouse_default_fee_recipient }}
+{% endif %}
+{% if lighthouse_enable_doppelganger_protection|bool == True %}
+      --enable-doppelganger-protection
+{% endif %}
+{% if lighthouse_metrics_enabled|bool == True  %}
+      --metrics=true
+      --metrics-address="{{ lighthouse_metrics_interface }}"
+      --metrics-port={{ lighthouse_metrics_port }}
+{% endif %}
+      --debug-level={{ lighthouse_log_level }}
+      --log-format=JSON
+      --log-file=/log/lighthouse-validator.log
+{% endif %}
+

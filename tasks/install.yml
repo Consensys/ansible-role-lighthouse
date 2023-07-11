@@ -1,0 +1,64 @@
+---
+- name: Ensure lodestar group exists
+  group:
+    name: "{{ lighthouse_group }}"
+    state: present
+  become: true
+  register: lighthouse_group_details
+
+- name: Create lodestar user
+  user:
+    comment:  lodestar client user
+    name: "{{ lighthouse_user }}"
+    group: "{{ lighthouse_group }}"
+  become: true
+  register: lighthouse_user_details
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ lighthouse_user }}"
+    group: "{{ lighthouse_group }}"
+  loop:
+    - "{{ lighthouse_base_dir }}"
+    - "{{ lighthouse_config_dir }}"    
+    - "{{ lighthouse_data_dir }}"
+    - "{{ lighthouse_log_dir }}"
+  become: true
+
+- name: Setup logrotate
+  template:
+    src: "logrotate/lodestar"
+    dest: "/etc/logrotate.d/lodestar"
+  become: true
+
+- name: Stop lighthouse
+  community.docker.docker_compose:
+    project_src: "{{ lighthouse_base_dir }}"
+    state: absent
+  ignore_errors: yes    
+
+- name: Create docker-compose.yml file
+  template:
+    src: lodestar-compose.yml.j2
+    dest: "{{ lighthouse_base_dir }}/docker-compose.yml"
+    owner: "{{ lighthouse_user }}"
+    group: "{{ lighthouse_group }}"
+    mode: 0644
+  become: yes
+
+- name: Give access to docker.sock
+  acl:
+    path: /var/run/docker.sock
+    entity: 1000
+    etype: user
+    permissions: rw
+    state: present
+  become: yes
+
+- name: Restart lodestar
+  community.docker.docker_compose:
+    project_src: "{{ lighthouse_base_dir }}"
+    restarted: true
+    state: present

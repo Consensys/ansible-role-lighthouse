@@ -1,0 +1,35 @@
+---
+galaxy_info:
+  author: Consensys 
+  role_name: lighthouse
+  description: lighthouse is an open-source ethereum 2 client
+  company: Consensys
+  license: license (Apache)
+  min_ansible_version: 2.6
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+        - cosmic
+    - name: EL
+      versions:
+        - 7
+    - name: Fedora
+      versions:
+        - 28
+        - 29
+        - 30
+    - name: MacOSX
+      versions:
+        - all
+  galaxy_tags:
+    - lodestar
+    - blockchain
+    - ethereum
+    - enterprise
+    - crypto

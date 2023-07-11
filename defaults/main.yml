@@ -1,0 +1,54 @@
+---
+# User and group
+lighthouse_user: lodestar
+lighthouse_group: "{{ lighthouse_user }}"
+
+# Directory paths
+lighthouse_image: "sigp/lighthouse"
+lighthouse_version: "latest"
+lighthouse_base_dir: "/opt/lodestar"
+lighthouse_data_dir: "{{ lighthouse_base_dir }}/data"
+lighthouse_config_dir: "/etc/lodestar"
+lighthouse_log_dir: "/var/log/lodestar"
+# jwt path on host
+lighthouse_jwt_auth_file: "/etc/jwt-secret.hex"
+
+
+# Logging
+lighthouse_log_level: info
+
+# networking
+lighthouse_host_ip: ""
+lighthouse_default_ip: "127.0.0.1"
+
+# lodestar config
+lighthouse_network: mainnet
+lighthouse_p2p_port: 9000
+lighthouse_execution_urls: "http://127.0.0.1:8551"
+lighthouse_validator_enabled: False
+lighthouse_validator_beaconnodes: "http://lodestar-beacon:9596"
+lighthouse_checkpoint_sync_url: "https://beaconstate-{{lighthouse_network}}.chainsafe.io"
+lighthouse_default_fee_recipient: ""
+lighthouse_disable_deposit_contract_sync: "True" 
+
+
+#metrics
+lighthouse_metrics_enabled: "True"
+lighthouse_metrics_interface: 0.0.0.0
+lighthouse_metrics_port: 8008
+
+# rest
+lighthouse_http_port: 5052
+lighthouse_http_enabled: "True"
+lighthouse_http_interface: "127.0.0.1"
+lighthouse_http_cors: "*"
+lighthouse_http_namespace: "beacon,config,events,node,validator,lightclient"
+
+# keymanager
+lighthouse_enable_doppelganger_protection: "True"
+lighthouse_keymanager_api_enabled: "True"
+lighthouse_keymanager_interface: "127.0.0.1"
+lighthouse_keymanager_port: 5062
+lighthouse_keymanager_cors: "*"
+lighthouse_keystores_dir: "/config/keys"
+lighthouse_secrets_dir: "/config/secrets"
