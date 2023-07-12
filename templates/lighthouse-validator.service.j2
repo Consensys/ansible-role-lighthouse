@@ -1,0 +1,17 @@
+[Unit]
+Description=lighthouse-validator
+After=syslog.target network.target
+
+[Service]
+User={{ lighthouse_user }}
+Group={{ lighthouse_group }}
+Environment=HOME=/home/{{ lighthouse_user }}
+Type=simple
+ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse vc {{ lighthouse_validator_cmdline_args }} >> {{ lighthouse_log_dir }}/validator.log 2>&1"
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10s
+WorkingDirectory={{ lighthouse_current_dir }}
+
+[Install]
+WantedBy=multi-user.target

@@ -22,8 +22,13 @@
     group: "{{ lighthouse_group }}"
   loop:
     - "{{ lighthouse_base_dir }}"
-    - "{{ lighthouse_config_dir }}"    
+    - "{{ lighthouse_install_dir }}"    
+    - "{{ lighthouse_config_dir }}"   
+    - "{{ lighthouse_keys_dir }}"
+    - "{{ lighthouse_wallet_dir }}"     
     - "{{ lighthouse_data_dir }}"
+    - "{{ lighthouse_data_dir }}"
+    - "{{ lighthouse_validator_data_dir }}"
     - "{{ lighthouse_log_dir }}"
   become: true
 
@@ -33,32 +38,31 @@
     dest: "/etc/logrotate.d/lighthouse"
   become: true
 
-- name: Stop lighthouse
-  community.docker.docker_compose:
-    project_src: "{{ lighthouse_base_dir }}"
-    state: absent
-  ignore_errors: yes    
-
-- name: Create docker-compose.yml file
-  template:
-    src: lighthouse-compose.yml.j2
-    dest: "{{ lighthouse_base_dir }}/docker-compose.yml"
+- name: Extract lighthouse source to install directory
+  unarchive:
+    src: "{{ lighthouse_download_url }}"
+    remote_src: true
+    dest: "{{ lighthouse_install_dir }}"
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
-    mode: 0644
-  become: yes
+    mode: '0775'
+    extra_opts:
+      - --strip-components
+      - '1'
+  become: true
+  register: extract_src
 
-- name: Give access to docker.sock
-  acl:
-    path: /var/run/docker.sock
-    entity: 1000
-    etype: user
-    permissions: rw
-    state: present
-  become: yes
+- name: Create a symlink to current
+  file:
+    src: "{{ lighthouse_install_dir }}/"
+    dest: "{{ lighthouse_current_dir }}"
+    state: link
+  register: create_symlink
+  become: true
 
-- name: Restart lighthouse
-  community.docker.docker_compose:
-    project_src: "{{ lighthouse_base_dir }}"
-    restarted: true
-    state: present
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    lighthouse_state_updates: "{{ lighthouse_state_updates + ['lighthouse.install_dir'] }}"
+    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.install_dir'] }}"
+    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.install_dir'] }}"
+  when: "extract_src is changed or create_symlink is changed"

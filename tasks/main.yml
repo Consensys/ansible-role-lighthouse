@@ -11,3 +11,11 @@
 
 - name: Install lighthouse
   include_tasks: "install.yml"
+
+- name: Start beacon
+  include_tasks: "beacon.yml"
+  when: lighthouse_beacon_enabled
+
+- name: Start validator
+  include_tasks: "validator.yml"
+  when: lighthouse_validator_enabled

@@ -1,0 +1,97 @@
+---
+- name: Add basics to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --network={{lighthouse_network}}
+      --datadir={{lighthouse_data_dir}}
+      --debug-level={{lighthouse_log_level}}
+      --log-file={{lighthouse_log_dir}}/beacon.log
+      --log-format=JSON
+      --execution-jwt={{lighthouse_jwt_auth_file}}
+      --execution-endpoint={{lighthouse_execution_urls}}
+      --port={{ lighthouse_p2p_port }}
+      --validator-monitor-auto
+
+- name: Add metrics to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --metrics
+      --metrics-address='{{ lighthouse_metrics_interface}}'
+      --metrics-port={{ lighthouse_metrics_port}}
+  when: lighthouse_metrics_enabled|bool == True
+
+- name: Add HTTP to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --http
+      --http-address='{{lighthouse_rpc_interface}}'
+      --http-port={{lighthouse_http_port}}
+      --http-allow-origin='{{lighthouse_http_cors}}'
+  when: lighthouse_http_enabled|bool == True
+
+- name: Add fee receipt to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
+  when: lighthouse_default_fee_recipient != ""
+
+- name: Add checkpoint sync to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --checkpoint-sync-url={{ lighthouse_checkpoint_sync_url }}
+  when: lighthouse_checkpoint_sync_url != ""
+
+- name: Add deposit_contract_sync to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --disable-deposit-contract-sync
+  when: lighthouse_disable_deposit_contract_sync|bool == True
+
+- name: Add custom cli args if provided
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      {{ lighthouse_beacon_custom_cmdline_args }}
+  when: lighthouse_beacon_custom_cmdline_args != ""
+
+- name: Sanitize beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: "{{lighthouse_beacon_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+
+- name: Show beacon cmdline_args
+  debug:
+    msg: "{{lighthouse_beacon_cmdline_args}}"
+
+- name: Create lighthouse-beacon systemd service
+  template:
+    src: "lighthouse-beacon.service.j2"
+    dest: "{{ lighthouse_systemd_dir }}/lighthouse-beacon.service"
+    owner: "root"
+    group: "root"
+  become: true
+  register: beacon_systemd_file
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.beacon_systemd_file'] }}"
+  when: beacon_systemd_file is changed
+
+- name: Reload systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: beacon_systemd_file is changed
+
+- name: Enable and start lighthouse-beacon service
+  systemd:
+    name: lighthouse-beacon
+    state: "{{ lighthouse_systemd_state }}"
+    enabled: true
+  become: true
+  when: lighthouse_state_updates_beacon|length > 0 

@@ -1,0 +1,17 @@
+[Unit]
+Description=lighthouse-beacon
+After=syslog.target network.target
+
+[Service]
+User={{ lighthouse_user }}
+Group={{ lighthouse_group }}
+Environment=HOME=/home/{{ lighthouse_user }}
+Type=simple
+ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse bn {{ lighthouse_beacon_cmdline_args }} >> {{ lighthouse_log_dir }}/beacon.log 2>&1"
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10s
+WorkingDirectory={{ lighthouse_current_dir }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,74 @@
+---
+- name: Add basics to the validator cmdline_args
+  set_fact:
+    lighthouse_validator_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --network={{lighthouse_network}}
+      --datadir={{lighthouse_data_dir}}
+      --debug-level={{lighthouse_log_level}}
+      --log-file={{lighthouse_log_dir}}/beacon.log
+      --log-format=JSON
+      --execution-jwt={{lighthouse_jwt_auth_file}}
+      --beacon-nodes="{{ lighthouse_validator_beaconnodes }}"
+      --validators-dir="{{ lighthouse_keystores_dir }}"
+      --secrets-dir="{{ lighthouse_secrets_dir }}"
+      --init-slashing-protection
+      --enable-doppelganger-protection
+
+- name: Add metrics to the validator cmdline_args
+  set_fact:
+    lighthouse_validator_cmdline_args: >
+      {{lighthouse_validator_cmdline_args}}
+      --monitoring-host='{{ lighthouse_metrics_interface}}'
+      --monitoring-port={{ lighthouse_validator_metrics_port}}
+  when: lighthouse_metrics_enabled|bool == True
+
+- name: Add fee receipt to the validator cmdline_args
+  set_fact:
+    lighthouse_validator_cmdline_args: >
+      {{lighthouse_validator_cmdline_args}}
+      --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
+  when: lighthouse_default_fee_recipient != ""
+
+- name: Add custom cli args if provided
+  set_fact:
+    lighthouse_validator_cmdline_args: >
+      {{lighthouse_validator_cmdline_args}}
+      {{ lighthouse_validator_custom_cmdline_args }}
+  when: lighthouse_validator_custom_cmdline_args != ""
+
+- name: Sanitize validator cmdline_args
+  set_fact:
+    lighthouse_validator_cmdline_args: "{{lighthouse_validator_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+
+- name: Show validator cmdline_args
+  debug:
+    msg: "{{lighthouse_validator_cmdline_args}}"
+
+- name: Create lighthouse-validator systemd service
+  template:
+    src: "lighthouse-validator.service.j2"
+    dest: "{{ lighthouse_systemd_dir }}/lighthouse-validator.service"
+    owner: "root"
+    group: "root"
+  become: true
+  register: validator_systemd_file
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
+  when: validator_systemd_file is changed
+
+- name: Reload systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: validator_systemd_file is changed
+
+- name: Enable and start lighthouse-validator service
+  systemd:
+    name: lighthouse-validator
+    state: "{{ lighthouse_systemd_state }}"
+    enabled: true
+  become: true
+  when: lighthouse_state_updates_validator|length > 0 
