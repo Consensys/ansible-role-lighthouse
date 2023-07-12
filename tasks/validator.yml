@@ -6,7 +6,7 @@
       --network={{lighthouse_network}}
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
-      --log-file={{lighthouse_log_dir}}/beacon.log
+      --logfile={{lighthouse_log_dir}}/beacon.log
       --log-format=JSON
       --execution-jwt={{lighthouse_jwt_auth_file}}
       --beacon-nodes="{{ lighthouse_validator_beaconnodes }}"

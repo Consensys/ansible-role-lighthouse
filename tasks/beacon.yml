@@ -6,7 +6,7 @@
       --network={{lighthouse_network}}
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
-      --log-file={{lighthouse_log_dir}}/beacon.log
+      --logfile={{lighthouse_log_dir}}/beacon.log
       --log-format=JSON
       --execution-jwt={{lighthouse_jwt_auth_file}}
       --execution-endpoint={{lighthouse_execution_urls}}
@@ -27,7 +27,7 @@
     lighthouse_beacon_cmdline_args: >
       {{lighthouse_beacon_cmdline_args}}
       --http
-      --http-address='{{lighthouse_rpc_interface}}'
+      --http-address='{{lighthouse_http_interface}}'
       --http-port={{lighthouse_http_port}}
       --http-allow-origin='{{lighthouse_http_cors}}'
   when: lighthouse_http_enabled|bool == True

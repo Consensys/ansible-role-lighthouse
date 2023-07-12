@@ -45,10 +45,7 @@
     dest: "{{ lighthouse_install_dir }}"
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
-    mode: '0775'
-    extra_opts:
-      - --strip-components
-      - '1'
+    mode: '0777'
   become: true
   register: extract_src
 

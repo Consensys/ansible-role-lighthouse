@@ -7,7 +7,6 @@ lighthouse_architecture: "x86_64"
 lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ lighthouse_version }}/lighthouse-{{ lighthouse_version }}-{{lighthouse_architecture}}-unknown-linux-gnu-portable.tar.gz"
 
 # Directory paths
-lighthouse_version: "latest"
 lighthouse_base_dir: "/opt/lighthouse"
 lighthouse_install_dir: "{{ lighthouse_base_dir }}/lighthouse-{{ lighthouse_version }}"
 lighthouse_current_dir: "{{ lighthouse_base_dir }}/current"
@@ -23,6 +22,10 @@ lighthouse_wallet_password_file: ""
 
 lighthouse_beacon_enabled: True
 lighthouse_validator_enabled: False
+lighthouse_beacon_cmdline_args: ""
+lighthouse_validator_cmdline_args: ""
+lighthouse_beacon_custom_cmdline_args: ""
+lighthouse_validator_custom_cmdline_args: ""
 
 # Managed service config
 lighthouse_systemd_state: restarted
