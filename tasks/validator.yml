@@ -6,6 +6,7 @@
       --network={{lighthouse_network}}
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
+      --logfile-debug-level={{lighthouse_log_level}}
       --logfile={{lighthouse_log_dir}}/beacon.log
       --log-format=JSON
       --execution-jwt={{lighthouse_jwt_auth_file}}
@@ -71,4 +72,4 @@
     state: "{{ lighthouse_systemd_state }}"
     enabled: true
   become: true
-  when: lighthouse_state_updates_validator|length > 0 
+  when: lighthouse_state_updates_validator|length > 0

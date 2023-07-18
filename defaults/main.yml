@@ -2,7 +2,7 @@
 # User and group
 lighthouse_user: lighthouse
 lighthouse_group: "{{ lighthouse_user }}"
-lighthouse_architecture: "x86_64" 
+lighthouse_architecture: "x86_64"
 # Version to install - linux only!
 lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ lighthouse_version }}/lighthouse-{{ lighthouse_version }}-{{lighthouse_architecture}}-unknown-linux-gnu-portable.tar.gz"
 
@@ -14,7 +14,6 @@ lighthouse_data_dir: "{{ lighthouse_base_dir }}/data"
 lighthouse_validator_data_dir: "{{ lighthouse_base_dir }}/validatorData"
 lighthouse_config_dir: "/etc/lighthouse"
 lighthouse_log_dir: "/var/log/lighthouse"
-lighthouse_jwt_auth_file: "/etc/jwt-secret.hex"
 lighthouse_jwt_auth_file: "/etc/jwt-secret.hex"
 lighthouse_keys_dir: "{{lighthouse_config_dir}}/keys"
 lighthouse_wallet_dir: "{{lighthouse_config_dir}}/wallet"
@@ -41,12 +40,13 @@ lighthouse_default_ip: "127.0.0.1"
 # lighthouse config
 lighthouse_network: mainnet
 lighthouse_log_level: info
+
 lighthouse_p2p_port: 9000
 lighthouse_execution_urls: "http://127.0.0.1:8551"
 lighthouse_validator_beaconnodes: "http://127.0.0.1:9596"
 lighthouse_checkpoint_sync_url: "https://beaconstate-{{lighthouse_network}}.chainsafe.io"
 lighthouse_default_fee_recipient: ""
-lighthouse_disable_deposit_contract_sync: "True" 
+lighthouse_disable_deposit_contract_sync: "True"
 lighthouse_enable_doppelganger_protection: "True"
 
 #metrics
