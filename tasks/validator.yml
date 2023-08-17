@@ -4,7 +4,6 @@
     lighthouse_validator_cmdline_args: >
       {{lighthouse_validator_cmdline_args}}
       --network={{lighthouse_network}}
-      --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
       --logfile-debug-level={{lighthouse_log_level}}
       --logfile={{lighthouse_log_dir}}/beacon.log
@@ -15,14 +14,6 @@
       --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
       --init-slashing-protection
       --enable-doppelganger-protection
-
-- name: Add metrics to the validator cmdline_args
-  set_fact:
-    lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args}}
-      --monitoring-host='{{ lighthouse_metrics_interface}}'
-      --monitoring-port={{ lighthouse_validator_metrics_port}}
-  when: lighthouse_metrics_enabled|bool == True
 
 - name: Add fee receipt to the validator cmdline_args
   set_fact:
