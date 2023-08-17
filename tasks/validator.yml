@@ -2,7 +2,7 @@
 - name: Add basics to the validator cmdline_args
   set_fact:
     lighthouse_validator_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+      {{lighthouse_validator_cmdline_args}}
       --network={{lighthouse_network}}
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
