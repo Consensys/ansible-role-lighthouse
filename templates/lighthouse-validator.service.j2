@@ -12,6 +12,9 @@ SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s
 WorkingDirectory={{ lighthouse_current_dir }}
+{% if lighthouse_validator_limit_no_file %}
+LimitNOFILE={{ lighthouse_validator_limit_no_file }}
+{% end %}
 
 [Install]
 WantedBy=multi-user.target

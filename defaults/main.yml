@@ -34,6 +34,7 @@ lighthouse_systemd_dir: /etc/systemd/system
 lighthouse_state_updates: []
 lighthouse_state_updates_validator: []
 lighthouse_state_updates_beacon: []
+lighthouse_validator_limit_no_file: 1024
 
 # networking
 lighthouse_host_ip: ""
