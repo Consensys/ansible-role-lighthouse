@@ -14,7 +14,7 @@ RestartSec=10s
 WorkingDirectory={{ lighthouse_current_dir }}
 {% if lighthouse_validator_limit_no_file %}
 LimitNOFILE={{ lighthouse_validator_limit_no_file }}
-{% end %}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
