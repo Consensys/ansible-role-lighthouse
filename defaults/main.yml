@@ -59,6 +59,6 @@ lighthouse_metrics_port: 8008
 lighthouse_validator_metrics_port: 8009
 # rest
 lighthouse_http_enabled: True
-lighthouse_http_port: 5052
+lighthouse_http_port: 5051
 lighthouse_http_interface: "127.0.0.1"
 lighthouse_http_cors: "*"
