@@ -19,8 +19,8 @@
   set_fact:
     lighthouse_validator_cmdline_args: >
       {{lighthouse_validator_cmdline_args}}
-      --graffiti='{{lighthouse_graffitti}}'
-  when: lighthouse_graffitti != ""
+      --graffiti='{{lighthouse_graffiti}}'
+  when: lighthouse_graffiti != ""
 
 - name: Add custom cli args if provided
   set_fact:
