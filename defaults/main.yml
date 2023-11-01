@@ -19,7 +19,7 @@ lighthouse_keys_dir: "{{lighthouse_config_dir}}/keys"
 lighthouse_wallet_dir: "{{lighthouse_config_dir}}/wallet"
 lighthouse_wallet_password_file: ""
 lighthouse_secrets_dir: "{{lighthouse_config_dir}}/secrets"
-lighthouse_graffitti: ""
+lighthouse_graffiti: ""
 
 lighthouse_beacon_enabled: True
 lighthouse_validator_enabled: False
