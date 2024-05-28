@@ -38,7 +38,6 @@ lighthouse_validator_limit_no_file: 1024
 
 # networking
 lighthouse_host_ip: ""
-lighthouse_default_ip: "127.0.0.1"
 
 # lighthouse config
 lighthouse_network: mainnet
