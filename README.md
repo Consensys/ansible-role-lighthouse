@@ -22,7 +22,7 @@ Ansible role that will install, configure and runs [lighthouse](https://lighthou
 
 ### Dependencies
 
-* Docker 
+* Docker
 
 ### Role Variables:
 
@@ -38,6 +38,8 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_data_dir`            | /opt/lighthouse/data               | Path for data directory                                                                                             |
 | `lighthouse_log_dir`             | /var/log/lighthouse                | Path for logs directory                                                                                             |
 | `lighthouse_log_level`           | "info"                             | Log level                                                                                                           |
+| `lighthouse_log_max_size`        | 25                                 | Log file size in MB to trigger rotation |
+| `lighthouse_log_max_number`      | 14                                 | Number of rotated log files to retain |
 | `lighthouse_network`             | mainnet                            | Predefined network configuration                                                                                    |
 | `lighthouse_jwt_auth_file`       | "/etc/jwt-secret.hex"              | Path of the JWT file                                                                                                |
 | `lighthouse_enable_doppelganger_protection` | True                    | Doppleganger protection enabled by default                                                                          |
@@ -62,7 +64,7 @@ ansible-galaxy install consensys.lighthouse
 ```
 
 Create a requirements.yml with the following:
-Replace `x.y.z` below with the version you would like to use 
+Replace `x.y.z` below with the version you would like to use
 ```
 ---
 - hosts: localhost
@@ -89,7 +91,7 @@ ansible-galaxy install git+https://github.com/consensys/ansible-role-lighthouse.
 ```
 
 Create a requirements.yml with the following:
-Replace `x.y.z` below with the version you would like to use 
+Replace `x.y.z` below with the version you would like to use
 ```
 ---
 - hosts: localhost

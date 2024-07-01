@@ -28,6 +28,10 @@ lighthouse_validator_cmdline_args: ""
 lighthouse_beacon_custom_cmdline_args: ""
 lighthouse_validator_custom_cmdline_args: ""
 
+# Same configuration used for both beacon and validator services
+lighthouse_log_max_size: 25
+lighthouse_log_max_number: 14
+
 # Managed service config
 lighthouse_systemd_state: restarted
 lighthouse_systemd_dir: /etc/systemd/system
