@@ -22,21 +22,15 @@
     group: "{{ lighthouse_group }}"
   loop:
     - "{{ lighthouse_base_dir }}"
-    - "{{ lighthouse_install_dir }}"    
-    - "{{ lighthouse_config_dir }}"   
+    - "{{ lighthouse_install_dir }}"
+    - "{{ lighthouse_config_dir }}"
     - "{{ lighthouse_keys_dir }}"
-    - "{{ lighthouse_wallet_dir }}"    
-    - "{{ lighthouse_secrets_dir }}" 
+    - "{{ lighthouse_wallet_dir }}"
+    - "{{ lighthouse_secrets_dir }}"
     - "{{ lighthouse_data_dir }}"
     - "{{ lighthouse_data_dir }}"
     - "{{ lighthouse_validator_data_dir }}"
     - "{{ lighthouse_log_dir }}"
-  become: true
-
-- name: Setup logrotate
-  template:
-    src: "logrotate/lighthouse"
-    dest: "/etc/logrotate.d/lighthouse"
   become: true
 
 - name: Extract lighthouse source to install directory

@@ -54,6 +54,13 @@
       --disable-deposit-contract-sync
   when: lighthouse_disable_deposit_contract_sync|bool == True
 
+- name: Add log rotation configuration
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
+      --logfile-max-number={{ lighthouse_log_max_number }}
+      --logfile-max-size={{ lighthouse_log_max_size }}
+
 - name: Add custom cli args if provided
   set_fact:
     lighthouse_beacon_cmdline_args: >
