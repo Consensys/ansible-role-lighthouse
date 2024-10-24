@@ -5,6 +5,11 @@
         msg: You must set "lighthouse_version" for this role to run
       when: lighthouse_version is not defined
 
+# Retrive latest version when lighthouse_version == 'latest'
+- name: Include task to retrieve latest version
+  ansible.builtin.include_tasks: "latest.yml"
+  when: lighthouse_version == 'latest'
+
 - name: Get IP address to bind to if not provided
   include_tasks: "network.yml"
   when: not lighthouse_host_ip

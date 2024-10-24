@@ -3,12 +3,16 @@
 lighthouse_user: lighthouse
 lighthouse_group: "{{ lighthouse_user }}"
 lighthouse_architecture: "x86_64"
+
+# Internal version
+_lighthouse_version: "{{ lighthouse_version }}"
+
 # Version to install - linux only!
-lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ lighthouse_version }}/lighthouse-{{ lighthouse_version }}-{{lighthouse_architecture}}-unknown-linux-gnu.tar.gz"
+lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ _lighthouse_version }}/lighthouse-{{ _lighthouse_version }}-{{lighthouse_architecture}}-unknown-linux-gnu.tar.gz"
 
 # Directory paths
 lighthouse_base_dir: "/opt/lighthouse"
-lighthouse_install_dir: "{{ lighthouse_base_dir }}/lighthouse-{{ lighthouse_version }}"
+lighthouse_install_dir: "{{ lighthouse_base_dir }}/lighthouse-{{ _lighthouse_version }}"
 lighthouse_current_dir: "{{ lighthouse_base_dir }}/current"
 lighthouse_data_dir: "{{ lighthouse_base_dir }}/data"
 lighthouse_validator_data_dir: "{{ lighthouse_base_dir }}/validatorData"
