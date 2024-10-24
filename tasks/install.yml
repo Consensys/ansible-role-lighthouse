@@ -33,7 +33,7 @@
     - "{{ lighthouse_log_dir }}"
   become: true
 
-- name: Extract lighthouse source to install directory
+- name: Extract lighthouse source to install directory [version {{ _lighthouse_version }}]
   unarchive:
     src: "{{ lighthouse_download_url }}"
     remote_src: true
