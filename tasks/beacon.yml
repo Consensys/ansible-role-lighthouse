@@ -12,7 +12,13 @@
       --execution-jwt={{lighthouse_jwt_auth_file}}
       --execution-endpoint={{lighthouse_execution_urls}}
       --port={{ lighthouse_p2p_port }}
+
+- name: Add validator-monitor-auto to the beacon cmdline_args
+  set_fact:
+    lighthouse_beacon_cmdline_args: >
+      {{lighthouse_beacon_cmdline_args}}
       --validator-monitor-auto
+  when: lighthouse_validator_monitor_auto_enabled|bool == True
 
 - name: Add metrics to the beacon cmdline_args
   set_fact:
