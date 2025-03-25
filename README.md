@@ -44,6 +44,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_jwt_auth_file`       | "/etc/jwt-secret.hex"              | Path of the JWT file                                                                                                |
 | `lighthouse_enable_doppelganger_protection` | True                    | Doppleganger protection enabled by default                                                                          |
 | `lighthouse_validator_enabled`              | "False"                 | Whether to run in validator mode - please note that the secrets and keys need to be copied by you                   |
+| `lighthouse_validator_monitor_auto_enabled` | "True"                  | Validator monitor auto enabled by default                                                                           |
 | `lighthouse_execution_urls`                 | "http://127.0.0.1:8551" | The elc execution url                                                                                               |
 | `lighthouse_validator_beaconnodes`          | "http://lighthouse-beacon:9596" | The beacon endpoint for the validator to use                                                                |
 | `lighthouse_checkpoint_sync_url`            | "https://beaconstate-{{lighthouse_network}}.chainsafe.io" | Checkpoint sync to speed things up                                                |

@@ -2,7 +2,7 @@
 - name: Add basics to the validator cmdline_args
   set_fact:
     lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args}}
+      {{lighthouse_validator_cmdline_args | join(' ') }}
       --network={{lighthouse_network}}
       --debug-level={{lighthouse_log_level}}
       --logfile-debug-level={{lighthouse_log_level}}
@@ -13,7 +13,14 @@
       --secrets-dir="{{ lighthouse_secrets_dir }}"
       --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
       --init-slashing-protection
+
+- name: Add enable-doppelganger-protection to the validator cmdline_args
+  set_fact:
+    lighthouse_validator_cmdline_args: >
+      {{lighthouse_validator_cmdline_args}}
       --enable-doppelganger-protection
+  when: lighthouse_enable_doppelganger_protection|bool == True
+
 
 - name: Add fee receipt to the validator cmdline_args
   set_fact:
