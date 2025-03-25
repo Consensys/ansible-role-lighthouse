@@ -7,7 +7,7 @@ User={{ lighthouse_user }}
 Group={{ lighthouse_group }}
 Environment=HOME=/home/{{ lighthouse_user }}
 Type=simple
-ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse vc {{ lighthouse_validator_cmdline_args }} >> {{ lighthouse_log_dir }}/validator.log 2>&1"
+ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse vc {{ lighthouse_validator_cmdline_args | join(' ') }} >> {{ lighthouse_log_dir }}/validator.log 2>&1"
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s
