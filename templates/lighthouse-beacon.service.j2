@@ -8,6 +8,7 @@ Group={{ lighthouse_group }}
 Environment=HOME=/home/{{ lighthouse_user }}
 Type=simple
 ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse bn {{ lighthouse_beacon_cmdline_args }}"
+ExecStartPost=/bin/sh -c "/bin/sleep 5 && /bin/chmod 640 {{ lighthouse_log_dir }}/beacon.log"
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s
