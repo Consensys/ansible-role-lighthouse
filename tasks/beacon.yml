@@ -1,8 +1,8 @@
 ---
 - name: Add basics to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args | join(' ') }}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --network={{lighthouse_network}}
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
@@ -15,15 +15,15 @@
 
 - name: Add validator-monitor-auto to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --validator-monitor-auto
   when: lighthouse_validator_monitor_auto_enabled|bool == True
 
 - name: Add metrics to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --metrics
       --metrics-address='{{ lighthouse_metrics_interface}}'
       --metrics-port={{ lighthouse_metrics_port}}
@@ -31,8 +31,8 @@
 
 - name: Add HTTP to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --http
       --http-address='{{lighthouse_http_interface}}'
       --http-port={{lighthouse_http_port}}
@@ -41,46 +41,46 @@
 
 - name: Add fee receipt to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
   when: lighthouse_default_fee_recipient != ""
 
 - name: Add checkpoint sync to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --checkpoint-sync-url={{ lighthouse_checkpoint_sync_url }}
   when: lighthouse_checkpoint_sync_url != ""
 
 - name: Add deposit_contract_sync to the beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --disable-deposit-contract-sync
   when: lighthouse_disable_deposit_contract_sync|bool == True
 
 - name: Add log rotation configuration
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
       --logfile-max-number={{ lighthouse_log_max_number }}
       --logfile-max-size={{ lighthouse_log_max_size }}
 
 - name: Add custom cli args if provided
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
-      {{ lighthouse_beacon_custom_cmdline_args }}
-  when: lighthouse_beacon_custom_cmdline_args != ""
+    lighthouse_beacon_internal_cmdline_args: >
+      {{lighthouse_beacon_internal_cmdline_args}}
+      {{ lighthouse_beacon_cmdline_args | join(' ') }}
+  when: lighthouse_beacon_cmdline_args != []
 
 - name: Sanitize beacon cmdline_args
   set_fact:
-    lighthouse_beacon_cmdline_args: "{{lighthouse_beacon_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+    lighthouse_beacon_internal_cmdline_args: "{{lighthouse_beacon_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
 - name: Show beacon cmdline_args
   debug:
-    msg: "{{lighthouse_beacon_cmdline_args}}"
+    msg: "{{lighthouse_beacon_internal_cmdline_args}}"
 
 - name: Create lighthouse-beacon systemd service
   template:
