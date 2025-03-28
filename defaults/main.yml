@@ -29,9 +29,11 @@ lighthouse_version_info_file: "{{ lighthouse_config_dir }}/clc_version"
 lighthouse_beacon_enabled: True
 lighthouse_validator_enabled: False
 # do not override lighthouse_beacon_internal_cmdline_args or lighthouse_validator_internal_cmdline_args 
+# these two are strings
 lighthouse_beacon_internal_cmdline_args: ""
 lighthouse_validator_internal_cmdline_args: ""
 # use these to pass in cmdline_args not present in the above
+# these two are lists
 lighthouse_beacon_cmdline_args: []
 lighthouse_validator_cmdline_args: []
 
