@@ -1,8 +1,8 @@
 ---
 - name: Add basics to the validator cmdline_args
   set_fact:
-    lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args | join(' ') }}
+    lighthouse_validator_internal_cmdline_args: >
+      {{lighthouse_validator_internal_cmdline_args | join(' ') }}
       --network={{lighthouse_network}}
       --debug-level={{lighthouse_log_level}}
       --logfile-debug-level={{lighthouse_log_level}}
@@ -16,40 +16,40 @@
 
 - name: Add enable-doppelganger-protection to the validator cmdline_args
   set_fact:
-    lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args}}
+    lighthouse_validator_internal_cmdline_args: >
+      {{lighthouse_validator_internal_cmdline_args}}
       --enable-doppelganger-protection
   when: lighthouse_enable_doppelganger_protection|bool == True
 
 
 - name: Add fee receipt to the validator cmdline_args
   set_fact:
-    lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args}}
+    lighthouse_validator_internal_cmdline_args: >
+      {{lighthouse_validator_internal_cmdline_args}}
       --graffiti='{{lighthouse_graffiti}}'
   when: lighthouse_graffiti != ""
 
 - name: Add log rotation configuration
   set_fact:
-    lighthouse_beacon_cmdline_args: >
-      {{lighthouse_beacon_cmdline_args}}
+    lighthouse_validator_internal_cmdline_args: >
+      {{lighthouse_validator_internal_cmdline_args}}
       --logfile-max-number={{ lighthouse_log_max_number }}
       --logfile-max-size={{ lighthouse_log_max_size }}
 
 - name: Add custom cli args if provided
   set_fact:
-    lighthouse_validator_cmdline_args: >
-      {{lighthouse_validator_cmdline_args}}
-      {{ lighthouse_validator_custom_cmdline_args }}
-  when: lighthouse_validator_custom_cmdline_args != ""
+    lighthouse_validator_internal_cmdline_args: >
+      {{lighthouse_validator_internal_cmdline_args}}
+      {{ lighthouse_validator_cmdline_args | join(' ') }}
+  when: lighthouse_validator_cmdline_args != []
 
 - name: Sanitize validator cmdline_args
   set_fact:
-    lighthouse_validator_cmdline_args: "{{lighthouse_validator_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+    lighthouse_validator_internal_cmdline_args: "{{lighthouse_validator_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
 - name: Show validator cmdline_args
   debug:
-    msg: "{{lighthouse_validator_cmdline_args}}"
+    msg: "{{lighthouse_validator_internal_cmdline_args}}"
 
 - name: Create lighthouse-validator systemd service
   template:

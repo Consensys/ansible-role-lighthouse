@@ -52,6 +52,10 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_disable_deposit_contract_sync`  | True                   |  The deposit_contract_sync for validators                                                                            |
 | `lighthouse_keystores_dir`  | "/config/keys"                         |  The keys directory for validators                                                                                   |
 | `lighthouse_secrets_dir`    | "/config/secrets"                      |  The secrets directory for validators                                                                                |
+| `lighthouse_beacon_cmdline_args`        | []                         |  List of cli args to append to the internal lighthouse_beacon_internal_cmdline_args                                  |
+| `lighthouse_validator_cmdline_args`    | []                          |  List of cli args to append to the internal lighthouse_validator_internal_cmdline_args                               |
+
+> :warning: **Please do not override lighthouse_beacon_internal_cmdline_args and lighthouse_validator_internal_cmdline_args**: Be very careful here! Only use `lighthouse_beacon_cmdline_args` and `lighthouse_validator_cmdline_args` which append to the respective args
 
 ### Keys/Secrets
 Please note that you must put your own secrets and keys in the config directory that you are using ie `lighthouse_config_dir`
