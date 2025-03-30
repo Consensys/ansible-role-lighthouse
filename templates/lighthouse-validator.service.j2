@@ -7,7 +7,7 @@ User={{ lighthouse_user }}
 Group={{ lighthouse_group }}
 Environment=HOME=/home/{{ lighthouse_user }}
 Type=simple
-ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse vc {{ lighthouse_validator_internal_cmdline_args }}"
+ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse vc {{ _lighthouse_validator_internal_cmdline_args }}"
 ExecStartPost=/bin/sh -c "/bin/sleep 5 && /bin/chmod 644 {{ lighthouse_log_dir }}/validator.log"
 SuccessExitStatus=143
 Restart=on-failure
