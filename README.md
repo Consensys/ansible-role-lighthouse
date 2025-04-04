@@ -54,6 +54,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_secrets_dir`    | "/config/secrets"                      |  The secrets directory for validators                                                                                |
 | `lighthouse_beacon_cmdline_args`        | []                         |  List of cli args to append to the internal _lighthouse_beacon_internal_cmdline_args                                  |
 | `lighthouse_validator_cmdline_args`    | []                          |  List of cli args to append to the internal _lighthouse_validator_internal_cmdline_args                               |
+| `lighthouse_beacon_environment_vars`   | []                          |  List of Environment variables to add to the systemd file for lighthouse-beacon, e.g `RUST_LOG=ERROR`                 |
 
 > :warning: **Please do not override _lighthouse_beacon_internal_cmdline_args and _lighthouse_validator_internal_cmdline_args**: Be very careful here! Only use `lighthouse_beacon_cmdline_args` and `lighthouse_validator_cmdline_args` which append to the respective args
 

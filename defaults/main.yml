@@ -36,6 +36,8 @@ _lighthouse_validator_internal_cmdline_args: ""
 # these two are lists
 lighthouse_beacon_cmdline_args: []
 lighthouse_validator_cmdline_args: []
+# these end up as systemd Environment entries
+lighthouse_beacon_environment_vars: []
 
 # Same configuration used for both beacon and validator services
 lighthouse_log_max_size: 25

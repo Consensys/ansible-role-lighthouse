@@ -6,6 +6,11 @@ After=syslog.target network.target
 User={{ lighthouse_user }}
 Group={{ lighthouse_group }}
 Environment=HOME=/home/{{ lighthouse_user }}
+{% if lighthouse_beacon_environment_vars | length > 0 %}
+{% for item in lighthouse_beacon_environment_vars %}
+Environment={{ item }}
+{% endfor %}
+{% endif %}
 Type=simple
 ExecStart=/bin/sh -c "{{ lighthouse_current_dir }}/lighthouse bn {{ _lighthouse_beacon_internal_cmdline_args }}"
 ExecStartPost=/bin/sh -c "/bin/sleep 5 && /bin/chmod 644 {{ lighthouse_log_dir }}/beacon.log"
