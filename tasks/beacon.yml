@@ -18,7 +18,7 @@
     _lighthouse_beacon_internal_cmdline_args: >
       {{_lighthouse_beacon_internal_cmdline_args}}
       --validator-monitor-auto
-  when: lighthouse_validator_monitor_auto_enabled|bool == True
+  when: lighthouse_validator_monitor_auto_enabled|bool
 
 - name: Add metrics to the beacon cmdline_args
   ansible.builtin.set_fact:
@@ -27,7 +27,7 @@
       --metrics
       --metrics-address='{{ lighthouse_metrics_interface}}'
       --metrics-port={{ lighthouse_metrics_port}}
-  when: lighthouse_metrics_enabled|bool == True
+  when: lighthouse_metrics_enabled|bool
 
 - name: Add HTTP to the beacon cmdline_args
   ansible.builtin.set_fact:
@@ -37,7 +37,7 @@
       --http-address='{{lighthouse_http_interface}}'
       --http-port={{lighthouse_http_port}}
       --http-allow-origin='{{lighthouse_http_cors}}'
-  when: lighthouse_http_enabled|bool == True
+  when: lighthouse_http_enabled|bool
 
 - name: Add fee receipt to the beacon cmdline_args
   ansible.builtin.set_fact:
@@ -58,7 +58,7 @@
     _lighthouse_beacon_internal_cmdline_args: >
       {{_lighthouse_beacon_internal_cmdline_args}}
       --disable-deposit-contract-sync
-  when: lighthouse_disable_deposit_contract_sync|bool == True
+  when: lighthouse_disable_deposit_contract_sync|bool
 
 - name: Add log rotation configuration
   ansible.builtin.set_fact:

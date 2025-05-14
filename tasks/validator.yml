@@ -19,7 +19,7 @@
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --enable-doppelganger-protection
-  when: lighthouse_enable_doppelganger_protection|bool == True
+  when: lighthouse_enable_doppelganger_protection|bool
 
 
 - name: Add fee receipt to the validator cmdline_args
