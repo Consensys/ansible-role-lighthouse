@@ -25,6 +25,7 @@ lighthouse_wallet_password_file: ""
 lighthouse_secrets_dir: "{{lighthouse_config_dir}}/secrets"
 lighthouse_graffiti: ""
 lighthouse_version_info_file: "{{ lighthouse_config_dir }}/clc_version"
+lighthouse_validator_version_info_file: "{{ lighthouse_config_dir }}/clc_validator_version"
 
 lighthouse_beacon_enabled: True
 lighthouse_validator_enabled: False
