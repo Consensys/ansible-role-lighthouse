@@ -16,5 +16,5 @@
     fail_msg: "Discovered version [{{ _lighthouse_version }}] is not valid"
 
 - name: Information
-  debug:
+  ansible.builtin.debug:
     msg: "Latest lighthouse version is {{ _lighthouse_version }}"

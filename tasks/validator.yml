@@ -1,6 +1,6 @@
 ---
 - name: Add basics to the validator cmdline_args
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args | join(' ') }}
       --network={{lighthouse_network}}
@@ -15,44 +15,44 @@
       --init-slashing-protection
 
 - name: Add enable-doppelganger-protection to the validator cmdline_args
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --enable-doppelganger-protection
-  when: lighthouse_enable_doppelganger_protection|bool == True
+  when: lighthouse_enable_doppelganger_protection|bool
 
 
 - name: Add fee receipt to the validator cmdline_args
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --graffiti='{{lighthouse_graffiti}}'
   when: lighthouse_graffiti != ""
 
 - name: Add log rotation configuration
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --logfile-max-number={{ lighthouse_log_max_number }}
       --logfile-max-size={{ lighthouse_log_max_size }}
 
 - name: Add custom cli args if provided
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       {{ lighthouse_validator_cmdline_args | join(' ') }}
   when: lighthouse_validator_cmdline_args != []
 
 - name: Sanitize validator cmdline_args
-  set_fact:
+  ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: "{{_lighthouse_validator_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
 - name: Show validator cmdline_args
-  debug:
+  ansible.builtin.debug:
     msg: "{{_lighthouse_validator_internal_cmdline_args}}"
 
 - name: Create lighthouse-validator systemd service
-  template:
+  ansible.builtin.template:
     src: "lighthouse-validator.service.j2"
     dest: "{{ lighthouse_systemd_dir }}/lighthouse-validator.service"
     owner: "root"
@@ -61,18 +61,18 @@
   register: validator_systemd_file
 
 - name: Set updated optionally to trigger a systemd restart at the end
-  set_fact:
+  ansible.builtin.set_fact:
     lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
   when: validator_systemd_file is changed
 
 - name: Reload systemd to reread configs
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
   become: true
   when: validator_systemd_file is changed
 
 - name: Enable and start lighthouse-validator service
-  systemd:
+  ansible.builtin.systemd:
     name: lighthouse-validator
     state: "{{ lighthouse_systemd_state }}"
     enabled: true

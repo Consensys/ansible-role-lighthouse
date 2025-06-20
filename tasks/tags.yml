@@ -1,8 +1,18 @@
 - name: Set the version on a local file so it can be used by other automation
-  copy: 
+  ansible.builtin.copy:
     content: "{{ _lighthouse_version }}"
     dest: "{{ lighthouse_version_info_file }}"
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
-    mode: 0644    
-  become: true    
+    mode: 0644
+  become: true
+
+- name: tags | Set the teku validator version on a local file so it can be used by other automation
+  ansible.builtin.copy:
+    content: "{{ _lighthouse_version }}"
+    dest: "{{ lighthouse_validator_version_info_file }}"
+    owner: "{{ lighthouse_user }}"
+    group: "{{ lighthouse_group }}"
+    mode: 0644
+  become: true
+  when: lighthouse_validator_enabled

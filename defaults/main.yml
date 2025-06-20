@@ -8,7 +8,7 @@ lighthouse_architecture: "x86_64"
 _lighthouse_version: "{{ lighthouse_version }}"
 
 # Version to install - linux only!
-lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ _lighthouse_version }}/lighthouse-{{ _lighthouse_version }}-{{lighthouse_architecture}}-unknown-linux-gnu.tar.gz"
+lighthouse_download_url: "https://github.com/sigp/lighthouse/releases/download/{{ _lighthouse_version }}/lighthouse-{{ _lighthouse_version }}-{{ lighthouse_architecture }}-unknown-linux-gnu.tar.gz"
 
 # Directory paths
 lighthouse_base_dir: "/opt/lighthouse"
@@ -19,12 +19,13 @@ lighthouse_validator_data_dir: "{{ lighthouse_base_dir }}/validatorData"
 lighthouse_config_dir: "/etc/lighthouse"
 lighthouse_log_dir: "/var/log/lighthouse"
 lighthouse_jwt_auth_file: "/etc/jwt-secret.hex"
-lighthouse_keys_dir: "{{lighthouse_config_dir}}/keys"
-lighthouse_wallet_dir: "{{lighthouse_config_dir}}/wallet"
+lighthouse_keys_dir: "{{ lighthouse_config_dir }}/keys"
+lighthouse_wallet_dir: "{{ lighthouse_config_dir }}/wallet"
 lighthouse_wallet_password_file: ""
-lighthouse_secrets_dir: "{{lighthouse_config_dir}}/secrets"
+lighthouse_secrets_dir: "{{ lighthouse_config_dir }}/secrets"
 lighthouse_graffiti: ""
 lighthouse_version_info_file: "{{ lighthouse_config_dir }}/clc_version"
+lighthouse_validator_version_info_file: "{{ lighthouse_config_dir }}/clc_validator_version"
 
 lighthouse_beacon_enabled: True
 lighthouse_validator_enabled: False
@@ -61,7 +62,7 @@ lighthouse_log_level: info
 lighthouse_p2p_port: 9000
 lighthouse_execution_urls: "http://127.0.0.1:8551"
 lighthouse_validator_beaconnodes: "http://127.0.0.1:9596"
-lighthouse_checkpoint_sync_url: "https://beaconstate-{{lighthouse_network}}.chainsafe.io"
+lighthouse_checkpoint_sync_url: "https://beaconstate-{{ lighthouse_network }}.chainsafe.io"
 lighthouse_default_fee_recipient: ""
 lighthouse_disable_deposit_contract_sync: "True"
 lighthouse_enable_doppelganger_protection: "True"

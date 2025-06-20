@@ -1,13 +1,13 @@
 ---
 - name: Ensure lighthouse group exists
-  group:
+  ansible.builtin.group:
     name: "{{ lighthouse_group }}"
     state: present
   become: true
   register: lighthouse_group_details
 
 - name: Create lighthouse user
-  user:
+  ansible.builtin.user:
     comment:  lighthouse client user
     name: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
@@ -15,7 +15,7 @@
   register: lighthouse_user_details
 
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ lighthouse_user }}"
@@ -34,7 +34,7 @@
   become: true
 
 - name: Extract lighthouse source to install directory [version {{ _lighthouse_version }}]
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ lighthouse_download_url }}"
     remote_src: true
     dest: "{{ lighthouse_install_dir }}"
@@ -45,7 +45,7 @@
   register: extract_src
 
 - name: Create a symlink to current
-  file:
+  ansible.builtin.file:
     src: "{{ lighthouse_install_dir }}/"
     dest: "{{ lighthouse_current_dir }}"
     state: link
@@ -53,7 +53,7 @@
   become: true
 
 - name: Set updated optionally to trigger a systemd restart at the end
-  set_fact:
+  ansible.builtin.set_fact:
     lighthouse_state_updates: "{{ lighthouse_state_updates + ['lighthouse.install_dir'] }}"
     lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.install_dir'] }}"
     lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.install_dir'] }}"

@@ -11,19 +11,19 @@
   when: lighthouse_version == 'latest'
 
 - name: Get IP address to bind to if not provided
-  include_tasks: "network.yml"
+  ansible.builtin.include_tasks: "network.yml"
   when: not lighthouse_host_ip
 
 - name: Install lighthouse
-  include_tasks: "install.yml"
+  ansible.builtin.include_tasks: "install.yml"
 
 - name: Start beacon
-  include_tasks: "beacon.yml"
+  ansible.builtin.include_tasks: "beacon.yml"
   when: lighthouse_beacon_enabled
 
 - name: Start validator
-  include_tasks: "validator.yml"
+  ansible.builtin.include_tasks: "validator.yml"
   when: lighthouse_validator_enabled
 
 - name: Set version info on a local file
-  include_tasks: "tags.yml"
+  ansible.builtin.include_tasks: "tags.yml"
