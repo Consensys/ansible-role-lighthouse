@@ -106,6 +106,6 @@
   ansible.builtin.systemd:
     name: lighthouse-beacon
     state: "{{ lighthouse_systemd_state }}"
-    enabled: true
+    enabled: "{{ (lighthouse_systemd_state!='stopped') | ternary('true', 'false') | bool }}"
   become: true
   when: lighthouse_state_updates_beacon|length > 0
