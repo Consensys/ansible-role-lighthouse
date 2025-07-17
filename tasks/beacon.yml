@@ -7,7 +7,7 @@
       --datadir={{lighthouse_data_dir}}
       --debug-level={{lighthouse_log_level}}
       --logfile-debug-level={{lighthouse_log_level}}
-      --logfile={{lighthouse_log_dir}}/beacon.log
+      --logfile-dir={{lighthouse_log_dir}}
       --log-format=JSON
       --execution-jwt={{lighthouse_jwt_auth_file}}
       --execution-endpoint={{lighthouse_execution_urls}}
@@ -52,13 +52,6 @@
       {{_lighthouse_beacon_internal_cmdline_args}}
       --checkpoint-sync-url={{ lighthouse_checkpoint_sync_url }}
   when: lighthouse_checkpoint_sync_url != ""
-
-- name: Add deposit_contract_sync to the beacon cmdline_args
-  ansible.builtin.set_fact:
-    _lighthouse_beacon_internal_cmdline_args: >
-      {{_lighthouse_beacon_internal_cmdline_args}}
-      --disable-deposit-contract-sync
-  when: lighthouse_disable_deposit_contract_sync|bool
 
 - name: Add log rotation configuration
   ansible.builtin.set_fact:

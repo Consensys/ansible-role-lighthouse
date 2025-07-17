@@ -6,7 +6,7 @@
       --network={{lighthouse_network}}
       --debug-level={{lighthouse_log_level}}
       --logfile-debug-level={{lighthouse_log_level}}
-      --logfile={{lighthouse_log_dir}}/validator.log
+      --logfile-dir={{lighthouse_log_dir}}
       --log-format=JSON
       --beacon-nodes="{{ lighthouse_validator_beaconnodes }}"
       --validators-dir="{{ lighthouse_keys_dir }}"

@@ -64,7 +64,6 @@ lighthouse_execution_urls: "http://127.0.0.1:8551"
 lighthouse_validator_beaconnodes: "http://127.0.0.1:9596"
 lighthouse_checkpoint_sync_url: "https://beaconstate-{{ lighthouse_network }}.chainsafe.io"
 lighthouse_default_fee_recipient: ""
-lighthouse_disable_deposit_contract_sync: "True"
 lighthouse_enable_doppelganger_protection: "True"
 lighthouse_validator_monitor_auto_enabled: "True"
 

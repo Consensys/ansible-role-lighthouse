@@ -49,7 +49,6 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `lighthouse_validator_beaconnodes`          | "http://lighthouse-beacon:9596" | The beacon endpoint for the validator to use                                                                |
 | `lighthouse_checkpoint_sync_url`            | "https://beaconstate-{{lighthouse_network}}.chainsafe.io" | Checkpoint sync to speed things up                                                |
 | `lighthouse_default_fee_recipient`          | ""                     | The default fee recepient address                                                                                    |
-| `lighthouse_disable_deposit_contract_sync`  | True                   |  The deposit_contract_sync for validators                                                                            |
 | `lighthouse_keystores_dir`  | "/config/keys"                         |  The keys directory for validators                                                                                   |
 | `lighthouse_secrets_dir`    | "/config/secrets"                      |  The secrets directory for validators                                                                                |
 | `lighthouse_beacon_cmdline_args`        | []                         |  List of cli args to append to the internal _lighthouse_beacon_internal_cmdline_args                                  |
