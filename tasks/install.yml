@@ -20,6 +20,7 @@
     state: directory
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
+    recurse: true
   loop:
     - "{{ lighthouse_base_dir }}"
     - "{{ lighthouse_install_dir }}"
