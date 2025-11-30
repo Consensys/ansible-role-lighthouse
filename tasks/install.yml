@@ -37,7 +37,7 @@
     path: "{{ lighthouse_data_dir }}/.ownership_initialized"
   register: ownership_marker
 
-- name: install | Set facts for running Teku services
+- name: install | Set facts for running lighthouse services
   ansible.builtin.set_fact:
     lighthouse_beacon_running: "{{ ansible_facts.services['lighthouse-beacon.service'].status == 'enabled' if 'lighthouse-beacon.service' in ansible_facts.services else false }}"
     lighthouse_validator_running: "{{ ansible_facts.services['lighthouse-validator.service'].status == 'enabled' if 'lighthouse-validator.service' in ansible_facts.services else false }}"
@@ -65,7 +65,7 @@
 - name: install | Set updated optionally to trigger a systemd restart at the end - lighthouse_state_updates_validator
   ansible.builtin.set_fact:
     lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
-  when: (item.item == 'teku-validator.service') and
+  when: (item.item == 'lighthouse-validator.service') and
         (item is defined) and
         (item.state | default('') == "stopped")
   loop: "{{ lighthouse_systemd_stopped.results }}"
