@@ -20,7 +20,6 @@
     state: directory
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
-    recurse: true
   loop:
     - "{{ lighthouse_base_dir }}"
     - "{{ lighthouse_install_dir }}"
@@ -29,10 +28,67 @@
     - "{{ lighthouse_wallet_dir }}"
     - "{{ lighthouse_secrets_dir }}"
     - "{{ lighthouse_data_dir }}"
-    - "{{ lighthouse_data_dir }}"
     - "{{ lighthouse_validator_data_dir }}"
     - "{{ lighthouse_log_dir }}"
   become: true
+
+- name: Ownership init marker
+  ansible.builtin.stat:
+    path: "{{ lighthouse_data_dir }}/.ownership_initialized"
+  register: ownership_marker
+
+- name: install | Set facts for running Teku services
+  ansible.builtin.set_fact:
+    lighthouse_beacon_running: "{{ ansible_facts.services['lighthouse-beacon.service'].status == 'enabled' if 'lighthouse-beacon.service' in ansible_facts.services else false }}"
+    lighthouse_validator_running: "{{ ansible_facts.services['lighthouse-validator.service'].status == 'enabled' if 'lighthouse-validator.service' in ansible_facts.services else false }}"
+
+- name: install | Stop running lighthouse services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: "stopped"
+  become: true
+  loop:
+    - lighthouse-beacon.service
+    - lighthouse-validator.service
+  register: lighthouse_systemd_stopped
+  when: (ansible_facts.services[item] is defined) and 
+        (ansible_facts.services[item].status == 'enabled')
+
+- name: install | Set updated optionally to trigger a systemd restart at the end - lighthouse_state_updates_beacon
+  ansible.builtin.set_fact:
+    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.beacon_systemd_file'] }}"
+  when: (item.item == 'lighthouse-beacon.service') and
+        (item is defined) and
+        (item.state | default('') == "stopped")
+  loop: "{{ lighthouse_systemd_stopped.results }}"
+
+- name: install | Set updated optionally to trigger a systemd restart at the end - lighthouse_state_updates_validator
+  ansible.builtin.set_fact:
+    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
+  when: (item.item == 'teku-validator.service') and
+        (item is defined) and
+        (item.state | default('') == "stopped")
+  loop: "{{ lighthouse_systemd_stopped.results }}"
+
+- block:
+    - name: One-time recursive ownership of data dir
+      ansible.builtin.file:
+        path: "{{ lighthouse_data_dir }}"
+        state: directory
+        owner: "{{ lighthouse_user }}"
+        group: "{{ lighthouse_group }}"
+        recurse: true
+      become: true
+
+    - name: Record that ownership was initialized
+      ansible.builtin.copy:
+        dest: "{{ lighthouse_data_dir }}/.ownership_initialized"
+        content: "initialized: {{ ansible_date_time.iso8601 }}"
+        owner: "{{ lighthouse_user }}"
+        group: "{{ lighthouse_group }}"
+        mode: "0644"
+      become: true
+  when: not ownership_marker.stat.exists
 
 - name: Extract lighthouse source to install directory [version {{ _lighthouse_version }}]
   ansible.builtin.unarchive:
