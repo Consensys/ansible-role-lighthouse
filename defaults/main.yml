@@ -3,6 +3,8 @@
 lighthouse_user: lighthouse
 lighthouse_group: "{{ lighthouse_user }}"
 lighthouse_architecture: "x86_64"
+lighthouse_uid: 1524
+lighthouse_gid: 1524
 
 # Internal version
 _lighthouse_version: "{{ lighthouse_version }}"
