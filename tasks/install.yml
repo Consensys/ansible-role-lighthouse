@@ -6,38 +6,42 @@
   register: lighthouse_user_entry
   failed_when: false
 
-- name: Extract current UID (only if user exists)
+- name: install | Determine if lighthouse user exists
   set_fact:
-    lighthouse_current_uid: "{{ lighthouse_user_entry.ansible_facts.getent_passwd[lighthouse_user][1] | int }}"
-  when: not lighthouse_user_entry.failed
+    lighthouse_user_exists: "{{ lighthouse_user in (lighthouse_user_entry.ansible_facts.getent_passwd | default({})) }}"
 
-- name: Determine if UID update is needed
-  set_fact:
-    lighthouse_uid_needs_update: "{{ lighthouse_current_uid != lighthouse_uid }}"
-  when: not lighthouse_user_entry.failed
+- block:
 
-- name: Stop enabled lighthouse services if UID needs update
-  service:
-    name: "{{ item.name }}"
-    state: stopped
-  loop:
-    - name: lighthouse-beacon
-      enabled: "{{ lighthouse_beacon_enabled }}"
-    - name: lighthouse-validator
-      enabled: "{{ lighthouse_validator_enabled }}"
-  when:
-    - item.enabled
-    - not lighthouse_user_entry.failed
-    - lighthouse_uid_needs_update
-  become: true
+  - name: Extract current UID (only if user exists)
+    set_fact:
+      lighthouse_current_uid: "{{ lighthouse_user_entry.ansible_facts.getent_passwd[lighthouse_user][1] | int }}"
 
-- name: Set updated optionally to trigger a systemd restart at the end
-  set_fact:
-    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + (['lighthouse.uid'] if lighthouse_beacon_enabled else []) }}"
-    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + (['lighthouse.uid'] if lighthouse_validator_enabled else []) }}"
-  when:
-    - not lighthouse_user_entry.failed
-    - lighthouse_uid_needs_update
+  - name: Determine if UID update is needed
+    set_fact:
+      lighthouse_uid_needs_update: "{{ lighthouse_current_uid != lighthouse_uid }}"
+
+  - name: Stop enabled lighthouse services if UID needs update
+    service:
+      name: "{{ item.name }}"
+      state: stopped
+    loop:
+      - name: lighthouse-beacon
+        enabled: "{{ lighthouse_beacon_enabled }}"
+      - name: lighthouse-validator
+        enabled: "{{ lighthouse_validator_enabled }}"
+    when:
+      - item.enabled
+      - lighthouse_uid_needs_update
+    become: true
+
+  - name: Set updated optionally to trigger a systemd restart at the end
+    set_fact:
+      lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + (['lighthouse.uid'] if lighthouse_beacon_enabled else []) }}"
+      lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + (['lighthouse.uid'] if lighthouse_validator_enabled else []) }}"
+    when:
+      - lighthouse_uid_needs_update
+
+  when: lighthouse_user_exists
 
 - name: Ensure lighthouse group exists
   ansible.builtin.group:
