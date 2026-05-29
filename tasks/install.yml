@@ -1,49 +1,74 @@
 ---
-- name: Lookup lighthouse user
-  getent:
+- name: install | Lookup lighthouse user
+  ansible.builtin.getent:
     database: passwd
     key: "{{ lighthouse_user }}"
   register: lighthouse_user_entry
   failed_when: false
 
 - name: install | Determine if lighthouse user exists
-  set_fact:
+  ansible.builtin.set_fact:
     lighthouse_user_exists: "{{ lighthouse_user in (lighthouse_user_entry.ansible_facts.getent_passwd | default({})) }}"
 
-- block:
+- name: install | If lighthouse user exists - check if the UID matches the expected value
+  when: lighthouse_user_exists | bool
+  block:
+    - name: install | Extract current UID
+      ansible.builtin.set_fact:
+        lighthouse_current_uid: "{{ lighthouse_user_entry.ansible_facts.getent_passwd[lighthouse_user][1] | int }}"
 
-  - name: Extract current UID (only if user exists)
-    set_fact:
-      lighthouse_current_uid: "{{ lighthouse_user_entry.ansible_facts.getent_passwd[lighthouse_user][1] | int }}"
+    - name: install | Determine if UID update is needed
+      ansible.builtin.set_fact:
+        lighthouse_uid_needs_update: "{{ lighthouse_current_uid != lighthouse_uid }}"
 
-  - name: Determine if UID update is needed
-    set_fact:
-      lighthouse_uid_needs_update: "{{ lighthouse_current_uid != lighthouse_uid }}"
+- name: install | Populate service facts
+  ansible.builtin.service_facts:
 
-  - name: Stop enabled lighthouse services if UID needs update
-    service:
-      name: "{{ item.name }}"
-      state: stopped
-    loop:
-      - name: lighthouse-beacon
-        enabled: "{{ lighthouse_beacon_enabled }}"
-      - name: lighthouse-validator
-        enabled: "{{ lighthouse_validator_enabled }}"
-    when:
-      - item.enabled
-      - lighthouse_uid_needs_update
-    become: true
+# This will ignore the case when lighthouse-beacon is manually stopped - it assumes that is a mistake
+# If you are manually stopping and updating lighthouse - disable the systemd service
+- name: install | Debug lighthouse-beacon service state
+  ansible.builtin.debug:
+    var: ansible_facts.services['lighthouse-beacon.service']
 
-  - name: Set updated optionally to trigger a systemd restart at the end
-    set_fact:
-      lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + (['lighthouse.uid'] if lighthouse_beacon_enabled else []) }}"
-      lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + (['lighthouse.uid'] if lighthouse_validator_enabled else []) }}"
-    when:
-      - lighthouse_uid_needs_update
+- name: install | Halt the beacon service if its running while we update
+  ansible.builtin.systemd:
+    name: lighthouse-beacon
+    state: "stopped"
+  become: true
+  register: lighthouse_beacon_systemd_stopped
+  when: (ansible_facts.services['lighthouse-beacon.service'] is defined) and
+        ((ansible_facts.services['lighthouse-beacon.service'].status == "enabled") or
+         (lighthouse_uid_needs_update | default(false) | bool))
 
-  when: lighthouse_user_exists
+- name: install | Set updated optionally to trigger a systemd restart at the end (beacon)
+  ansible.builtin.set_fact:
+    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.running_service'] }}"
+  when: (lighthouse_beacon_systemd_stopped is defined) and
+        (lighthouse_beacon_systemd_stopped.state | default('') == "stopped")
 
-- name: Ensure lighthouse group exists
+# This will ignore the case when lighthouse-validator is manually stopped - it assumes that is a mistake
+# If you are manually stopping and updating lighthouse - disable the systemd service
+- name: install | Debug lighthouse-validator service state
+  ansible.builtin.debug:
+    var: ansible_facts.services['lighthouse-validator.service']
+
+- name: install | Halt the validator service if its running while we update
+  ansible.builtin.systemd:
+    name: lighthouse-validator
+    state: "stopped"
+  become: true
+  register: lighthouse_validator_systemd_stopped
+  when: (ansible_facts.services['lighthouse-validator.service'] is defined) and
+        ((ansible_facts.services['lighthouse-validator.service'].status == "enabled") or
+         (lighthouse_uid_needs_update | default(false) | bool))
+
+- name: install | Set updated optionally to trigger a systemd restart at the end (validator)
+  ansible.builtin.set_fact:
+    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.running_service'] }}"
+  when: (lighthouse_validator_systemd_stopped is defined) and
+        (lighthouse_validator_systemd_stopped.state | default('') == "stopped")
+
+- name: install | Ensure lighthouse group exists
   ansible.builtin.group:
     name: "{{ lighthouse_group }}"
     gid: "{{ lighthouse_gid }}"
@@ -51,22 +76,22 @@
   become: true
   register: lighthouse_group_details
 
-- name: Create lighthouse user
+- name: install | Create lighthouse user
   ansible.builtin.user:
-    comment:  lighthouse client user
+    comment: lighthouse client user
     name: "{{ lighthouse_user }}"
     uid: "{{ lighthouse_uid }}"
     group: "{{ lighthouse_group }}"
   become: true
   register: lighthouse_user_details
 
-- name: Create directories
+- name: install | Create directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ lighthouse_user }}"
     group: "{{ lighthouse_group }}"
-    recurse: true    
+    recurse: true
   loop:
     - "{{ lighthouse_base_dir }}"
     - "{{ lighthouse_install_dir }}"
@@ -79,46 +104,15 @@
     - "{{ lighthouse_log_dir }}"
   become: true
 
-- name: Ownership init marker
+- name: install | Ownership init marker
   ansible.builtin.stat:
     path: "{{ lighthouse_data_dir }}/.ownership_initialized"
   register: ownership_marker
 
-- name: install | Set facts for running lighthouse services
-  ansible.builtin.set_fact:
-    lighthouse_beacon_running: "{{ ansible_facts.services['lighthouse-beacon.service'].status == 'enabled' if 'lighthouse-beacon.service' in ansible_facts.services else false }}"
-    lighthouse_validator_running: "{{ ansible_facts.services['lighthouse-validator.service'].status == 'enabled' if 'lighthouse-validator.service' in ansible_facts.services else false }}"
-
-- name: install | Stop running lighthouse services
-  ansible.builtin.systemd:
-    name: "{{ item }}"
-    state: "stopped"
-  become: true
-  loop:
-    - lighthouse-beacon.service
-    - lighthouse-validator.service
-  register: lighthouse_systemd_stopped
-  when: (ansible_facts.services[item] is defined) and 
-        (ansible_facts.services[item].status == 'enabled')
-
-- name: install | Set updated optionally to trigger a systemd restart at the end - lighthouse_state_updates_beacon
-  ansible.builtin.set_fact:
-    lighthouse_state_updates_beacon: "{{ lighthouse_state_updates_beacon + ['lighthouse.beacon_systemd_file'] }}"
-  when: (item.item == 'lighthouse-beacon.service') and
-        (item is defined) and
-        (item.state | default('') == "stopped")
-  loop: "{{ lighthouse_systemd_stopped.results }}"
-
-- name: install | Set updated optionally to trigger a systemd restart at the end - lighthouse_state_updates_validator
-  ansible.builtin.set_fact:
-    lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
-  when: (item.item == 'lighthouse-validator.service') and
-        (item is defined) and
-        (item.state | default('') == "stopped")
-  loop: "{{ lighthouse_systemd_stopped.results }}"
-
-- block:
-    - name: One-time recursive ownership of data dir
+- name: install | One-time recursive ownership of data dir
+  when: not ownership_marker.stat.exists
+  block:
+    - name: install | Set recursive ownership of data dir
       ansible.builtin.file:
         path: "{{ lighthouse_data_dir }}"
         state: directory
@@ -127,7 +121,7 @@
         recurse: true
       become: true
 
-    - name: Record that ownership was initialized
+    - name: install | Record that ownership was initialized
       ansible.builtin.copy:
         dest: "{{ lighthouse_data_dir }}/.ownership_initialized"
         content: "initialized: {{ ansible_date_time.iso8601 }}"
@@ -135,9 +129,8 @@
         group: "{{ lighthouse_group }}"
         mode: "0644"
       become: true
-  when: not ownership_marker.stat.exists
 
-- name: Extract lighthouse source to install directory [version {{ _lighthouse_version }}]
+- name: install | Extract lighthouse source to install directory [version {{ _lighthouse_version }}]
   ansible.builtin.unarchive:
     src: "{{ lighthouse_download_url }}"
     remote_src: true
@@ -148,7 +141,7 @@
   become: true
   register: extract_src
 
-- name: Create a symlink to current
+- name: install | Create a symlink to current
   ansible.builtin.file:
     src: "{{ lighthouse_install_dir }}/"
     dest: "{{ lighthouse_current_dir }}"
@@ -156,7 +149,7 @@
   register: create_symlink
   become: true
 
-- name: Set updated optionally to trigger a systemd restart at the end
+- name: install | Set updated optionally to trigger a systemd restart at the end
   ansible.builtin.set_fact:
     lighthouse_state_updates: "{{ lighthouse_state_updates + ['lighthouse.install_dir'] }}"
     lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.install_dir'] }}"

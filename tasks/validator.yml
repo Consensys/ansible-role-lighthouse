@@ -1,5 +1,5 @@
 ---
-- name: Add basics to the validator cmdline_args
+- name: validator | Add basics to the validator cmdline_args
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args | join(' ') }}
@@ -14,7 +14,7 @@
       --suggested-fee-recipient={{lighthouse_default_fee_recipient}}
       --init-slashing-protection
 
-- name: Add enable-doppelganger-protection to the validator cmdline_args
+- name: validator | Add enable-doppelganger-protection to the validator cmdline_args
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
@@ -22,36 +22,36 @@
   when: lighthouse_enable_doppelganger_protection|bool
 
 
-- name: Add fee receipt to the validator cmdline_args
+- name: validator | Add fee receipt to the validator cmdline_args
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --graffiti='{{lighthouse_graffiti}}'
   when: lighthouse_graffiti != ""
 
-- name: Add log rotation configuration
+- name: validator | Add log rotation configuration
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       --logfile-max-number={{ lighthouse_log_max_number }}
       --logfile-max-size={{ lighthouse_log_max_size }}
 
-- name: Add custom cli args if provided
+- name: validator | Add custom cli args if provided
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: >
       {{_lighthouse_validator_internal_cmdline_args}}
       {{ lighthouse_validator_cmdline_args | join(' ') }}
   when: lighthouse_validator_cmdline_args != []
 
-- name: Sanitize validator cmdline_args
+- name: validator | Sanitize validator cmdline_args
   ansible.builtin.set_fact:
     _lighthouse_validator_internal_cmdline_args: "{{_lighthouse_validator_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
-- name: Show validator cmdline_args
+- name: validator | Show validator cmdline_args
   ansible.builtin.debug:
     msg: "{{_lighthouse_validator_internal_cmdline_args}}"
 
-- name: Create lighthouse-validator systemd service
+- name: validator | Create lighthouse-validator systemd service
   ansible.builtin.template:
     src: "lighthouse-validator.service.j2"
     dest: "{{ lighthouse_systemd_dir }}/lighthouse-validator.service"
@@ -60,18 +60,18 @@
   become: true
   register: validator_systemd_file
 
-- name: Set updated optionally to trigger a systemd restart at the end
+- name: validator | Set updated optionally to trigger a systemd restart at the end
   ansible.builtin.set_fact:
     lighthouse_state_updates_validator: "{{ lighthouse_state_updates_validator + ['lighthouse.validator_systemd_file'] }}"
   when: validator_systemd_file is changed
 
-- name: Reload systemd to reread configs
+- name: validator | Reload systemd to reread configs
   ansible.builtin.systemd:
     daemon_reload: yes
   become: true
   when: validator_systemd_file is changed
 
-- name: Enable and start lighthouse-validator service
+- name: validator | Enable and start lighthouse-validator service
   ansible.builtin.systemd:
     name: lighthouse-validator
     state: "{{ lighthouse_systemd_state }}"

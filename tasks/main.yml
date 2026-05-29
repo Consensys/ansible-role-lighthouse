@@ -1,37 +1,37 @@
 ---
-- name: Ensure we have sane configuration
+- name: main | Ensure we have sane configuration
   block:
     - fail:
         msg: You must set "lighthouse_version" for this role to run
       when: lighthouse_version is not defined
 
-- name: Fetch architecture of the host
+- name: main | Fetch architecture of the host
   debug:
     var: ansible_facts.architecture
 
-- name: Set system architecture to download appropriate binary
+- name: main | Set system architecture to download appropriate binary
   set_fact:
     lighthouse_architecture: "{{ 'aarch64' if ansible_facts.architecture == 'aarch64' else 'x86_64' }}"
 
 # Retrive latest version when lighthouse_version == 'latest'
-- name: Include task to retrieve latest version
+- name: main | Include task to retrieve latest version
   ansible.builtin.include_tasks: "latest.yml"
   when: lighthouse_version == 'latest'
 
-- name: Get IP address to bind to if not provided
+- name: main | Get IP address to bind to if not provided
   ansible.builtin.include_tasks: "network.yml"
   when: not lighthouse_host_ip
 
-- name: Install lighthouse
+- name: main | Install lighthouse
   ansible.builtin.include_tasks: "install.yml"
 
-- name: Start beacon
+- name: main | Start beacon
   ansible.builtin.include_tasks: "beacon.yml"
   when: lighthouse_beacon_enabled
 
-- name: Start validator
+- name: main | Start validator
   ansible.builtin.include_tasks: "validator.yml"
   when: lighthouse_validator_enabled
 
-- name: Set version info on a local file
+- name: main | Set version info on a local file
   ansible.builtin.include_tasks: "tags.yml"
